@@ -41,7 +41,7 @@ exports.signInUser = async (req, res) => {
 
     try {
     
-        const [rows] = await db2.execute("SELECT id , email , firstName , role ,password, createdAt FROM user  WHERE email = ?", [email]);
+        const [rows] = await db2.execute("SELECT id , email , firstName , role ,password, createdAt FROM User  WHERE email = ?", [email]);
 
         if (rows.length === 0) {
             return res.status(401).json({ error: "Invalid email or password" });
