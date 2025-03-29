@@ -2,7 +2,9 @@ const db = require('../config/db');
 const { v4: uuidv4 } = require("uuid");
 
 exports.createCategory = async (req, res) => {
+  console.log("hi");
     const { name } = req.body;
+    console.log(name);
   
     if (!name) {
       return res.status(400).json({ error: "Category name is required" });
@@ -11,7 +13,7 @@ exports.createCategory = async (req, res) => {
     const id = uuidv4(); 
   
     try {
-      await db.execute("INSERT INTO category (id, name) VALUES (?, ?)", [id, name]);
+      await db.db1.execute("INSERT INTO category (id, name) VALUES (?, ?)", [id, name]);
       res.status(201).json({ message: "Category created successfully!", id });
     } catch (error) {
       res.status(500).json({ error: "Server is not responding" });
@@ -20,7 +22,7 @@ exports.createCategory = async (req, res) => {
 
 exports.getCategory = async (req, res) => {
     try {
-        const [messages] = await db.execute('SELECT * FROM category');
+        const [messages] = await db.db1.execute('SELECT * FROM category');
         res.status(200).json(messages);
     } catch (error) {
         res.status(500).json({ error:"Server is not responding"   });
@@ -40,7 +42,7 @@ exports.updateCategory = async (req, res) => {
 }
 
   try {
-      const [result] = await db.execute('UPDATE category SET name = ? WHERE id = ?', [name, id]);
+      const [result] = await db.db1.execute('UPDATE category SET name = ? WHERE id = ?', [name, id]);
 
       if (result.affectedRows === 0) {
           return res.status(404).json({ error: "Category not found" });
@@ -60,7 +62,7 @@ exports.deleteCategory = async (req, res) => {
   }
 
   try {
-      const [result] = await db.execute('DELETE FROM category WHERE id = ?', [id]);
+      const [result] = await db.db1.execute('DELETE FROM category WHERE id = ?', [id]);
 
       if (result.affectedRows === 0) {
           return res.status(404).json({ error: "Category not found" });

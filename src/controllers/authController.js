@@ -1,7 +1,7 @@
-const db = require('../config/db');
 const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { db1, db2 } = require("../config/db");
 require("dotenv").config();
 
 exports.createUser = async (req, res) => {
@@ -17,7 +17,7 @@ exports.createUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10); 
 
     try {
-        await db.execute(
+        await db1.execute(
             "INSERT INTO users (id, name, email, password, role) VALUES (?, ?, ?, ?, ?)",
             [id, name, email, hashedPassword, role]
         );
@@ -41,13 +41,14 @@ exports.signInUser = async (req, res) => {
 
     try {
     
-        const [rows] = await db.execute("SELECT * FROM users WHERE email = ?", [email]);
+        const [rows] = await db2.execute("SELECT id , email , firstName , role ,password, createdAt FROM user  WHERE email = ?", [email]);
 
         if (rows.length === 0) {
             return res.status(401).json({ error: "Invalid email or password" });
         }
 
         const user = rows[0];
+       
 
       
         const passwordMatch = await bcrypt.compare(password, user.password);
@@ -60,10 +61,10 @@ exports.signInUser = async (req, res) => {
         const token = jwt.sign(
             {
                 id: user.id,
-                name: user.name,
+                name: user.firstName,
                 email: user.email,
                 role: user.role,
-                created_at: user.created_at
+                createdAt: user.createdAt
             },
             process.env.JWT_SECRET, 
             { expiresIn: "7d" } 
